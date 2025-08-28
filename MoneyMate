@@ -1,1 +1,28 @@
+from flask import Flask, render_template
+import sqlite3
+import os
+
+app = Flask(__name__)
+
+# ---------------------------
+# Database Setup
+# ---------------------------
+DB_NAME = "moneymate.db"
+
+def init_db():
+    if not os.path.exists(DB_NAME):
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
+        # Create transactions table
+        cursor.execute('''
+            CREATE TABLE transactions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                amount REAL NOT NULL,
+                category TEXT NOT NULL,
+                description TEXT,
+                date TEXT NOT NULL
+            )
+        ''')
+        conn.commit()
+        conn.close()
 
