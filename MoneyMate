@@ -1,1 +1,15 @@
+@app.route("/dashboard")
+def dashboard():
+    with sqlite3.connect(DB_NAME) as conn:
+        cur = conn.cursor()
+        
+        # Total income
+        cur.execute("SELECT SUM(amount) FROM transactions WHERE type='income'")
+        total_income = cur.fetchone()[0] or 0
 
+        # Total expenses
+        cur.execute("SELECT SUM(amount) FROM transactions WHERE type='expense'")
+        total_expense = cur.fetchone()[0] or 0
+
+        # Balance
+        balance = total_income - total_expense
