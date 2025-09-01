@@ -26,3 +26,21 @@ def init_db():
         conn.commit()
         conn.close()
 
+
+
+# ---------------------------
+# Routes
+# ---------------------------
+@app.route('/')
+def index():
+    return render_template("index.html")  # Karrtee (frontend) will make this
+
+
+# ---------------------------
+# Run App
+# ---------------------------
+if __name__ == "__main__":
+    init_db()
+    app.run(debug=True)
+✅ What this does:
+
