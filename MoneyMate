@@ -1,1 +1,30 @@
+from flask import Flask, render_template
+
+# Initialize Flask app
+app = Flask(__name__)
+
+# -------------------------
+# Home route (Karrtee will design later)
+# -------------------------
+@app.route('/')
+def home():
+    return render_template("index.html")
+
+# -------------------------
+# Dashboard route (Farhan's part)
+# Dummy values now – later connected to DB by Kumanan
+# -------------------------
+@app.route('/dashboard')
+def dashboard():
+    total_income = 0      # will come from DB later
+    total_expense = 0     # will come from DB later
+    balance = total_income - total_expense
+    return render_template("dashboard.html",
+                           income=total_income,
+                           expense=total_expense,
+                           balance=balance)
+
+# Run the app
+if __name__ == "__main__":
+    app.run(debug=True)
 
