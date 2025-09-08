@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MoneyMate{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <h1>💰 MoneyMate</h1>
+        <nav>
+            <a href="/">Home</a> |
+            <a href="/dashboard">Dashboard</a>
+        </nav>
+        <hr>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <hr>
+        <p>&copy; 2025 MoneyMate Project</p>
+    </footer>
+</body>
+</html>
