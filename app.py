@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
+from collections import defaultdict
+from datetime import datetime
 import sqlite3
 import os
 
@@ -49,6 +51,7 @@ def dashboard():
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    # Totals
     cursor.execute("SELECT SUM(amount) FROM transactions WHERE type='income'")
     total_income = cursor.fetchone()[0] or 0
 
@@ -57,15 +60,34 @@ def dashboard():
 
     balance = total_income - total_expense
 
+    # All transactions
     cursor.execute("SELECT * FROM transactions ORDER BY date DESC")
     transactions = cursor.fetchall()
 
+    # Pie chart: Expenses by category
+    cursor.execute("SELECT category, SUM(amount) FROM transactions WHERE type='expense' GROUP BY category")
+    category_data = cursor.fetchall()
+    pie_labels = [row['category'] for row in category_data]
+    pie_values = [row['SUM(amount)'] for row in category_data]
+
+    # Bar chart: Monthly expenses
+    cursor.execute("SELECT strftime('%Y-%m', date) AS month, SUM(amount) FROM transactions WHERE type='expense' GROUP BY month")
+    monthly_data = cursor.fetchall()
+    bar_labels = [row['month'] for row in monthly_data]
+    bar_values = [row['SUM(amount)'] for row in monthly_data]
+
     conn.close()
+
     return render_template("dashboard.html",
                            income=total_income,
                            expense=total_expense,
                            balance=balance,
-                           transactions=transactions)
+                           transactions=transactions,
+                           pie_labels=pie_labels,
+                           pie_values=pie_values,
+                           bar_labels=bar_labels,
+                           bar_values=bar_values)
+
 
 @app.route('/add', methods=['GET', 'POST'])
 def add_transaction():
