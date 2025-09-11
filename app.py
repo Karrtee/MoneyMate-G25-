@@ -110,6 +110,44 @@ def add_transaction():
         return redirect(url_for('dashboard'))
 
     return render_template("add.html")
+    
+# Transaction Routes
+
+@app.route('/transactions')
+def list_transactions():
+    """Show all transactions"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM transactions ORDER BY date DESC")
+    transactions = cursor.fetchall()
+    conn.close()
+    return render_template("transactions.html", transactions=transactions)
+
+
+@app.route('/transaction/<int:transaction_id>')
+def view_transaction(transaction_id):
+    """View a single transaction"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM transactions WHERE id = ?", (transaction_id,))
+    transaction = cursor.fetchone()
+    conn.close()
+
+    if transaction is None:
+        return "Transaction not found", 404
+
+    return render_template("transaction_detail.html", transaction=transaction)
+
+
+@app.route('/delete/<int:transaction_id>', methods=['POST'])
+def delete_transaction(transaction_id):
+    """Delete a transaction"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM transactions WHERE id = ?", (transaction_id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('list_transactions'))
 
 # Run Flask app
 if __name__ == "__main__":
