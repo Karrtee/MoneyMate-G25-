@@ -92,18 +92,28 @@ def dashboard():
 @app.route('/add', methods=['GET', 'POST'])
 def add_transaction():
     if request.method == 'POST':
-        amount = float(request.form['amount'])
-        category = request.form['category']
-        description = request.form['description']
+        amount_str = request.form['amount'].strip()
+        try:
+            amount = float(amount_str)
+            if amount <= 0:
+                return "Amount must be greater than 0", 400
+        except ValueError:
+            return "Amount must be a valid decimal number", 400
+
+        category = request.form['category'].strip()
+        description = request.form['description'].strip()
         date = request.form['date']
         t_type = request.form['type']
+
+        if not category or not date or t_type not in ('income', 'expense'):
+            return "Invalid input", 400
 
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("""
             INSERT INTO transactions (amount, category, description, date, type)
             VALUES (?, ?, ?, ?, ?)
-        """, (amount, category, description, date, t_type))
+        """, (round(amount, 2), category, description, date, t_type))
         conn.commit()
         conn.close()
 
