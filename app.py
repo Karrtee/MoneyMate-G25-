@@ -46,6 +46,22 @@ init_db()
 def home():
     return render_template("index.html")
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+        # Add your registration logic here (e.g., save user to database, check password match)
+        # For now, just redirect to login or show a message
+        if password == confirm_password:
+            # Save user logic here
+            return redirect(url_for('login'))
+        else:
+            return render_template('register.html', error='Passwords do not match.')
+    return render_template('register.html')
+
+
 @app.route('/dashboard')
 def dashboard():
     conn = get_db_connection()
