@@ -1,11 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for
-from collections import defaultdict
+from flask import Flask, render_template, request, redirect, url_for, flash
 from datetime import datetime
 import sqlite3
 import os
 
-# Initialize Flask app
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # Needed for flash messages
 
 # -------------------------
 # Database Setup
@@ -44,26 +43,38 @@ init_db()
 
 @app.route('/')
 def home():
-    return render_template("index.html")
+    """Show login page as the main page"""
+    return render_template("login.html")
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    """User registration page"""
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
         confirm_password = request.form['confirm_password']
-        # Add your registration logic here (e.g., save user to database, check password match)
-        # For now, just redirect to login or show a message
-        if password == confirm_password:
-            # Save user logic here
-            return redirect(url_for('login'))
-        else:
-            return render_template('register.html', error='Passwords do not match.')
+        if password != confirm_password:
+            flash('Passwords do not match.', 'danger')
+            return render_template('register.html')
+        # Here you would save the user to the database
+        flash('Registration successful! Please log in.', 'success')
+        return redirect(url_for('login'))
     return render_template('register.html')
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """User login page"""
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        # Here you would check user credentials
+        flash('Logged in successfully!', 'success')
+        return redirect(url_for('dashboard'))
+    return render_template('login.html')
 
 @app.route('/dashboard')
 def dashboard():
+    """Main dashboard with summary and charts"""
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -104,9 +115,9 @@ def dashboard():
                            bar_labels=bar_labels,
                            bar_values=bar_values)
 
-
 @app.route('/add', methods=['GET', 'POST'])
 def add_transaction():
+    """Add a new transaction"""
     if request.method == 'POST':
         amount = float(request.form['amount'])
         category = request.form['category']
@@ -123,11 +134,10 @@ def add_transaction():
         conn.commit()
         conn.close()
 
+        flash('Transaction added!', 'success')
         return redirect(url_for('dashboard'))
 
     return render_template("add.html")
-    
-# Transaction Routes
 
 @app.route('/transactions')
 def list_transactions():
@@ -139,7 +149,6 @@ def list_transactions():
     conn.close()
     return render_template("transactions.html", transactions=transactions)
 
-
 @app.route('/transaction/<int:transaction_id>')
 def view_transaction(transaction_id):
     """View a single transaction"""
@@ -150,10 +159,10 @@ def view_transaction(transaction_id):
     conn.close()
 
     if transaction is None:
-        return "Transaction not found", 404
+        flash("Transaction not found.", "danger")
+        return redirect(url_for('list_transactions'))
 
     return render_template("transaction_detail.html", transaction=transaction)
-
 
 @app.route('/delete/<int:transaction_id>', methods=['POST'])
 def delete_transaction(transaction_id):
@@ -163,6 +172,7 @@ def delete_transaction(transaction_id):
     cursor.execute("DELETE FROM transactions WHERE id = ?", (transaction_id,))
     conn.commit()
     conn.close()
+    flash('Transaction deleted.', 'info')
     return redirect(url_for('list_transactions'))
 
 # Run Flask app
