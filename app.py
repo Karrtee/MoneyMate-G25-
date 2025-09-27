@@ -164,6 +164,20 @@ def add_transaction():
         date = request.form['date']
         t_type = request.form['type']
 
+        if not amount or not category or not date or not t_type:
+            return render_template("add.html", error="All fields except description are required.")
+
+        try:
+            amount = float(amount)
+
+            if amount <= 0:
+                return render_template("add.html", error="Amount must be greater than zero.")
+        except ValueError:
+            return render_template("add.html", error="Amount must be a valid number (no symbols).")
+
+        if t_type not in ['income', 'expense']:
+            return render_template("add.html", error="Type must be either income or expense.")
+
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("""
