@@ -21,9 +21,29 @@
             <input type="number" step="0.01" class="form-control" name="amount" required>
         </div>
         <div class="mb-3">
-            <label>Category</label>
-            <input type="text" class="form-control" name="category" required>
-        </div>
+           <label>Category</label>
+            <select class="form-control" name="category" required>
+            <!-- Income Categories -->
+            <option disabled>--- Income ---</option>
+            <option value="Salary">Salary</option>
+            <option value="Allowance">Allowance</option>
+            <option value="Bonus">Bonus</option>
+            <option value="Investment">Investment</option>
+            <option value="Freelance">Freelance</option>
+
+            <!-- Expense Categories -->
+            <option disabled>--- Expenses ---</option>
+            <option value="Food">Food</option>
+            <option value="Transport">Transport</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Bills">Bills</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Healthcare">Healthcare</option>
+            <option value="Education">Education</option>
+            <option value="Others">Others</option>
+          </select>
+         </div>
+
         <div class="mb-3">
             <label>Description</label>
             <input type="text" class="form-control" name="description">
@@ -40,7 +60,8 @@
             </select>
         </div>
         <button type="submit" class="btn btn-primary">Save</button>
-        <a href="{{ url_for('add_transaction') }}" class="btn btn-success">Add Transaction</a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Back</a>
+
     </form>
 </body>
 </html>
